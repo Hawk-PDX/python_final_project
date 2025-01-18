@@ -1,19 +1,11 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
-from models.database import Base
+import sqlite3
 
-class Quest(Base):
-    __tablename__ = 'quests'
-
-    id = Column(Integer, primary_key=True)
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
-    reward = Column(Integer, default=0)
-    status = Column(String, default='incomplete')
-    player_id = Column(Integer, ForeignKey('players.id'))
-
-    # *** Many-to-one relationship with player ***
-    player = relationship("Player")
+class Quest:
+    def __init__(self, title, description, reward, player_id):
+        self.title = title
+        self.description = description
+        self.reward = reward
+        self.player_id = player_id
 
     def __repr__(self):
-        return f"<Quest(title='{self.title}', status='{self.status}')>"
+        return f"<Quest(title='{self.title}', status='incomplete')>"

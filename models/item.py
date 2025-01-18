@@ -3,6 +3,10 @@ from sqlalchemy.orm import relationship
 from models.database import Base
 
 class Item(Base):
+    
+    
+    drops = relationship("Drop", back_populates="item")
+    
     __tablename__ = 'items'
 # *** nullable *** required for sql interaction; None doesnt work?
     id = Column(Integer, primary_key=True)
