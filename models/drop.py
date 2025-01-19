@@ -1,9 +1,11 @@
-import sqlite3
+from base import Base
+from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 
-class Drop:
-    def __init__(self, enemy_id, item_id):
-        self.enemy_id = enemy_id
-        self.item_id = item_id
-
-    def __repr__(self):
-        return f"<Drop(enemy_id={self.enemy_id}, item_id={self.item_id})>"
+class Drop(Base):
+    __tablename__ = 'drops'
+    id = Column(Integer, primary_key=True)
+    enemy_id = Column(Integer, ForeignKey('enemies.id'))
+    item_id = Column(Integer, ForeignKey('items.id'))
+    enemy = relationship("Enemy", back_populates="drops")
+    item = relationship("Item", back_populates="drops")
