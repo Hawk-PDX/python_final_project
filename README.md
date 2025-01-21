@@ -1,8 +1,10 @@
 ** python_final_project **
 
+######
+
 # Game Details/Objective
 
-    Defeat the enemy usings base or advanced attacks.
+    Defeat the enemy using base or advanced attacks.
     The game will end when the player's/ enemy's health reaches zero.
     The player will start with 100 health and the enemy will start with 100 health.
     Players `special attacks` can be used to defeat the enemy as well as, in certain scenarios, heal the player and/or group. 
@@ -15,10 +17,10 @@
     `tick` = 1 second
     `proc` = between 1-5 seconds... results are random
     `healing potion` = 1 use per game
-    `special attack` = can be used as attained... special attack possiblities are as follows:
+    `special attack` = can be used as attained... special attack possibilities are as follows:
         -- for every 5 successfully landed base attacks, the player will gain a ** special attack **
         -- special attacks can be used to defeat the enemy, heal the player, or heal the group (this ability is shared amongst players/enemies alike...)
-        -- special attacks can be used in conjunction with base attacks to increase damage output or, in kind, can be fired to provide a certian amount of hp back to all remaining (alive) players.
+        -- special attacks can be used in conjunction with base attacks to increase damage output or, in kind, can be fired to provide a certain amount of hp back to all remaining (alive) players.
 
 # Classes
 
@@ -46,7 +48,7 @@
     Class_level: []
     Class_skills: Sneak Attack (167% of base attack dmg), 
     Backstab = (220% of base_attack, available every 5 seconds), 
-    Poison = (+ and -) 3 hp (plus for self == neg hp for each enemy) every `tick`... 1 `tick` = 1/(1.5 seconds) ### 1 to 1 self healz (based on equivilent enemy HP draw...) ###
+    Poison = (+ and -) 3 hp (plus for self == neg hp for each enemy) every `tick`... 1 `tick` = 1/(1.5 seconds) ### 1 to 1 self healz (based on equivalent enemy HP draw...) ###
 
 *** Class 4: Ranger ***
 

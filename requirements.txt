@@ -1,6 +1,4 @@
-SQLAlchemy==1.4.29
-# pip install SQLAlchemy==1.4.29
-
-# config.py
-
 DATABASE_URL = 'sqlite:///game_database.db'
+SQLAlchemy==1.4.29
+passlib==1.7.4
+config.py
