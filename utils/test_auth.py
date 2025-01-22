@@ -1,9 +1,8 @@
-# test_auth.py
 from utils.database import Session
 from utils.crud_utils import create_user, validate_user_credentials
 
 def test_registration():
-    # Test user registration
+    # Test reg
     session = Session()
     user = create_user(session, username="john_doe", email="john@example.com", password="password123")
     print(f"User    created: {user.username}")
@@ -11,7 +10,7 @@ def test_registration():
 
 
 def test_login():
-    # Test user login
+    # Test login
     session = Session()
     user = validate_user_credentials(session, username="john_doe", password="password123")
     if user:
@@ -21,6 +20,6 @@ def test_login():
     session.close()
 
 if __name__ == "__main__":
-    # Run the tests
+    # Run tests
     test_registration()
     test_login()

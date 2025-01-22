@@ -1,10 +1,17 @@
-from .base import BaseModel
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
+from .base import BaseModel
 
 class User(BaseModel):
     __tablename__ = 'users'
-    username = Column(String, unique=True, nullable=False)
-    email = Column(String, unique=True, nullable=False)
+
+    # Unique attributes
+    username = Column(String, unique=True, nullable=False, index=True)  # Indexed for faster queries
+    email = Column(String, unique=True, nullable=False, index=True)     # Indexed for faster queries
     password = Column(String, nullable=False)
-    players = relationship("Player", back_populates="user")
+
+    # Relationships
+    players = relationship("Player", secondary="user_players", back_populates="user")
+
+    def __repr__(self):
+        return f"<User    username={self.username}, email={self.email}>"

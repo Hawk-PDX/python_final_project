@@ -1,5 +1,3 @@
-# exceptions.py
-
 class InvalidInputError(Exception):
     """Raised when the user provides invalid input."""
     pass
