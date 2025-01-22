@@ -1,19 +1,17 @@
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from .base import BaseModel
+from .base import Base
 
-class Enemy(BaseModel):
-    __tablename__ = 'enemies'
+class Enemy(Base):
+    __tablename__ = "enemies"
 
-    # Unique attributes
+    id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    health = Column(Integer, default=100)  # Default health in %
-    attack = Column(Integer, default=10)   # Default attack power
-    defense = Column(Integer, default=5)   # Default defense
-    game_id = Column(Integer, ForeignKey('games.id'), nullable=False)
-
-    # Relationships
-    game = relationship("Game", back_populates="enemies")
+    game_id = Column(Integer, ForeignKey("games.id"), nullable=False)
+    game = relationship("Game", backref="enemies")
+    health = Column(Integer, default=100)
+    attack = Column(Integer, default=10)
+    defense = Column(Integer, default=5)
 
     def __repr__(self):
-        return f"<Enemy name={self.name}, health={self.health}, attack={self.attack}>"
+        return f"Enemy(id={self.id}, name='{self.name}', game_id={self.game_id}, health={self.health}, attack={self.attack}, defense={self.defense})"

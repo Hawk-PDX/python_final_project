@@ -20,7 +20,22 @@ def check_required_params(params, required_fields):
             raise InvalidInputError(f"{field} is required.")
 
 # Consolidated function for creating entities
-def create_entity(session: Session, entity_type: str, **kwargs):
+def create_entity(session: Session, entity_type: str, **kwargs) -> object:
+    """
+    Creates a new entity of the specified type.
+
+    Args:
+        session (Session): The database session.
+        entity_type (str): The type of entity to create.
+        **kwargs: Additional keyword arguments for the entity.
+
+    Returns:
+        object: The created entity.
+
+    Raises:
+        InvalidInputError: If the entity type is invalid.
+        DatabaseError: If the entity creation fails.
+    """
     try:
         if entity_type == "user":
             check_required_params(kwargs, ["username", "email", "password"])
@@ -34,10 +49,10 @@ def create_entity(session: Session, entity_type: str, **kwargs):
             entity = Game(name=kwargs["name"], description=kwargs["description"], char_class=kwargs["char_class"], char_role=kwargs["char_role"], player_id=kwargs["player_id"])
         elif entity_type == "enemy":
             check_required_params(kwargs, ["name", "game_id"])
-            entity = Enemy(name=kwargs["name"], game_id=kwargs["game_id"], health=kwargs.get("health", DEFAULT_ENEMY_HEALTH), attack=kwargs.get("attack", DEFAULT_ENEMY_ATTACK), defense=kwargs.get("defense", DEFAULT_ENEMY_DEFENSE))
+            entity = Enemy(name=kwargs["name"], game_id=kwargs["game_id"], health=kwargs.get("health", 100), attack=kwargs.get("attack", 10), defense=kwargs.get("defense", 5))
         elif entity_type == "item":
             check_required_params(kwargs, ["name", "type", "player_id"])
-            entity = Item(name=kwargs["name"], type=kwargs["type"], player_id=kwargs["player_id"], value=kwargs.get("value", DEFAULT_ITEM_VALUE))
+            entity = Item(name=kwargs["name"], type=kwargs["type"], player_id=kwargs["player_id"], value=kwargs.get("value", 0))
         else:
             raise InvalidInputError(f"Invalid entity type: {entity_type}")
 
@@ -46,10 +61,23 @@ def create_entity(session: Session, entity_type: str, **kwargs):
         return entity
     except Exception as e:
         session.rollback()
-        raise DatabaseError(f"Failed to create {entity_type}: {str(e)}")
+        raise DatabaseError(f"Failed to create {entity_type}: {str(e)}") from e
 
-# Consolidated function for fetching entities
-def get_entity(session: Session, entity_type: str, entity_id: int):
+def get_entity(session: Session, entity_type: str, entity_id: int) -> object:
+    """
+    Retrieves an entity of the specified type by ID.
+
+    Args:
+        session (Session): The database session.
+        entity_type (str): The type of entity to retrieve.
+        entity_id (int): The ID of the entity to retrieve.
+
+    Returns:
+        object: The retrieved entity.
+
+    Raises:
+        InvalidInputError: If the entity type is invalid.
+    """
     if entity_type == "user":
         return session.query(User).filter(User.id == entity_id).first()
     elif entity_type == "player":
@@ -62,9 +90,24 @@ def get_entity(session: Session, entity_type: str, entity_id: int):
         return session.query(Item).filter(Item.id == entity_id).first()
     else:
         raise InvalidInputError(f"Invalid entity type: {entity_type}")
+    
+# updating entities
+def update_entity(session: Session, entity_type: str, entity_id: int, **kwargs) -> object:
+    """
+    Updates an entity of the specified type by ID.
 
-# Consolidated function for updating entities
-def update_entity(session: Session, entity_type: str, entity_id: int, **kwargs):
+    Args:
+        session (Session): The database session.
+        entity_type (str): The type of entity to update.
+        entity_id (int): The ID of the entity to update.
+        **kwargs: Additional keyword arguments for the entity.
+
+    Returns:
+        object: The updated entity.
+
+    Raises:
+        InvalidInputError: If the entity type is invalid.
+    """
     entity = get_entity(session, entity_type, entity_id)
     if entity:
         for key, value in kwargs.items():
@@ -73,8 +116,19 @@ def update_entity(session: Session, entity_type: str, entity_id: int, **kwargs):
         session.refresh(entity)  # Refresh the entity after update
     return entity
 
-# Consolidated function for deleting entities
+# Delete entities -- consolodated 
 def delete_entity(session: Session, entity_type: str, entity_id: int):
+    """
+    Deletes an entity of the specified type by ID.
+
+    Args:
+        session (Session): The database session.
+        entity_type (str): The type of entity to delete.
+        entity_id (int): The ID of the entity to delete.
+
+    Raises:
+        InvalidInputError: If the entity type is invalid.
+    """
     entity = get_entity(session, entity_type, entity_id)
     if entity:
         session.delete(entity)

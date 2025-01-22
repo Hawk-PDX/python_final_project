@@ -7,6 +7,29 @@
 
 ######
 
+***
+
+Dev notes (notes for relaying my implementation/understanding of specific case uses, additionally, questions for Sakib):
+
+	• Reduced login logic to provide a more ‘test-friendly/demonstrative’ environment.
+		— some logic remains and may appear unnecessary or redundant in regards to it’s present functionality… to include, unused imports, etc.
+
+	• A large amount of included notes are rudimentary… most could/should/will be removed and / or amended at a later date.
+	
+	• some imports may appear foreign to my cohorts… and I apologize in advance!
+			— if at any point, anybody digesting my final product may reach out and I would
+				be happy to explain any facet outside the scope of our current Phase. 
+
+	• kwargs — (key word arguments) allow for creation/handling of multiple named args... can be treated/referenced like a     dict w/i a function (question for Sakib, “is this considered best practice?”)
+
+Once again, Consider:
+
+	Project requirements included the use of SQLite as Python’s core ORM ‘friendly’…
+		— as I progressed through the development of this specific project’s expected functionality, I was originally unaware that, in order to succeed in final implementation, additional dependencies would be necessary. 
+		— in that light, SQLAlchemy was used in it’s stead.
+
+######
+
 # WALKTHROUGH -- VERBOSE
 
 Creating or Selecting a Character

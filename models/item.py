@@ -1,18 +1,16 @@
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from .base import BaseModel
+from .base import Base
 
-class Item(BaseModel):
-    __tablename__ = 'items'
+class Item(Base):
+    __tablename__ = "items"
 
-    # Unique attributes
+    id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     type = Column(String, nullable=False)
+    player_id = Column(Integer, ForeignKey("players.id"), nullable=False)
+    player = relationship("Player", backref="items")
     value = Column(Integer, default=0)
-    player_id = Column(Integer, ForeignKey('players.id'), nullable=False)
-
-    # Relationships
-    player = relationship("Player", back_populates="items")
 
     def __repr__(self):
-        return f"<Item name={self.name}, type={self.type}, value={self.value}>"
+        return f"Item(id={self.id}, name='{self.name}', type='{self.type}', player_id={self.player_id}, value={self.value})"

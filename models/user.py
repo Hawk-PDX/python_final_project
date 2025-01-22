@@ -1,17 +1,23 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
-from .base import BaseModel
+from .base import Base
+from passlib.hash import bcrypt
 
-class User(BaseModel):
-    __tablename__ = 'users'
+class User(Base):
+    __tablename__ = "users"
 
-    # Unique attributes
-    username = Column(String, unique=True, nullable=False, index=True)  # Indexed for faster queries
-    email = Column(String, unique=True, nullable=False, index=True)     # Indexed for faster queries
+    id = Column(Integer, primary_key=True)
+    username = Column(String, nullable=False, unique=True)
+    email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
 
-    # Relationships
-    players = relationship("Player", secondary="user_players", back_populates="user")
+    def __init__(self, username, email, password):
+        self.username = username
+        self.email = email
+        self.password = bcrypt.hash(password)
 
     def __repr__(self):
-        return f"<User    username={self.username}, email={self.email}>"
+        return f"User (id={self.id}, username='{self.username}', email='{self.email}')"
+
+    def check_password(self, password):
+        return bcrypt.verify(password, self.password)
