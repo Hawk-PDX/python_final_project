@@ -6,7 +6,7 @@ from models.enemy_base import Enemy
 from models.game_base import Game
 from models.user import User
 from models.item import Item
-from .exceptions import InvalidInputError, PlayerNotFoundError, DatabaseError
+from ..utils.exceptions import InvalidInputError, PlayerNotFoundError, DatabaseError
 
 @pytest.fixture
 def session():

@@ -1,3 +1,4 @@
+# models/base.py
 from sqlalchemy import Column, Integer, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base
 

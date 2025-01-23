@@ -1,6 +1,7 @@
+# models/user.py
+from . import Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
-from .base import Base
 
 class User(Base):
     __tablename__ = "users"
@@ -19,7 +20,7 @@ class User(Base):
         self.password = password
 
     def __repr__(self):
-        return f"User (id={self.id}, username='{self.username}', email='{self.email}')"
+        return f"User  (id={self.id}, username='{self.username}', email='{self.email}')"
 
     def check_password(self, password):
         return password == self.password

@@ -1,6 +1,5 @@
 from .exceptions import InsufficientHealthError, InvalidActionError
-from models.player import Player
-from models.enemy_base import Enemy
+from models import Player, Enemy
 
 def fight(player, enemy):
     # Initialize health and mana/energy for player and enemy

@@ -1,17 +1,14 @@
 from utils.database import Session, engine
 from models.base import Base
-from models.player import Player
-from models.game_base import Game
-from models.enemy_base import Enemy
-from models.user import User
+from models import Player, Game, Enemy, Item, User
 from utils.cli_utils import display_welcome_message, get_player_input
 from utils.game_utils import fight
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from rich.text import Text
 from rich.style import Style
 from rich.progress import Progress
+from utils import create_user, validate_user_credentials, fight, start_game, display_welcome_message, get_player_input
 
 console = Console()
 
@@ -42,7 +39,7 @@ def login():
         username = get_player_input("Enter username: ")
         email = get_player_input("Enter email: ")
         password = get_player_input("Enter password: ")
-        console.print(f"User     [bold]{username}[/bold] created successfully!", style="bold green")
+        console.print(f"User       [bold]{username}[/bold] created successfully!", style="bold green")
         return {"username": username, "email": email, "password": password}
     elif choice == "2":
         username = get_player_input("Enter username: ")
@@ -139,49 +136,15 @@ def start_game(player):
     console.print("Let's go!", style="bold green")
 
     # Create enemy - level 1
-    enemy = Enemy(name=LEVEL_ENEMIES[1]["name"], game_id=game.id, health=LEVEL_ENEMIES[1]["health"], attack=LEVEL_ENEMIES[1]["attack"], defense=LEVEL_ENEMIES[1]["defense"])
-
-    # Start battle
-    console.print(Panel("Starting battle...", style="bold red"))
-    fight(player, enemy)
-
-    # Check if player survived
-    if player["health"] <= 0:
-        console.print(Panel("Try again?… I'll be waiting", style="bold red"))
-        return
-    else:
-        console.print(Panel("You survived! Congratulations!", style="bold green"))
-        console.print("You little… I'll get you next time!!!", style="italic")
-
-    # Level 2
-    console.print(Panel("\n--- Level 2: The Dark Forest ---", style="bold blue"))
-    console.print("Location: Forest Park, Portland, Oregon", style="italic")
-    console.print("Player: The forest is eerily quiet...", style="italic")
-    console.print("Suddenly, an Orc appears!", style="bold red")
-
-    # enemy - level 2
-    enemy = Enemy(name=LEVEL_ENEMIES[2]["name"], game_id=game.id, health=LEVEL_ENEMIES[2]["health"], attack=LEVEL_ENEMIES[2]["attack"], defense=LEVEL_ENEMIES[2]["defense"])
-
-    # Start battle
-    console.print(Panel("Starting battle...", style="bold red"))
-    fight(player, enemy)
-
-    # Check if player survived
-    if player["health"] <= 0:
-        console.print(Panel("Try again?… I'll be waiting", style="bold red"))
-        return
-    else:
-        console.print(Panel("You survived! Congratulations!", style="bold green"))
-        console.print("You little… I'll get you next time!!!", style="italic")
-
-    # Level 3
-    console.print(Panel("\n--- Level 3: The Dragon's Lair ---", style="bold blue"))
-    console.print("Location: Mount Hood, Oregon", style="italic")
-    console.print("Player: The air is thick with smoke...", style="italic")
-    console.print("A Dragon emerges from the shadows!", style="bold red")
-
-    # enemy - level 3
-    enemy = Enemy(name=LEVEL_ENEMIES[3]["name"], game_id=game.id, health=LEVEL_ENEMIES[3]["health"], attack=LEVEL_ENEMIES[3]["attack"], defense=LEVEL_ENEMIES[3]["defense"])
+    enemy = Enemy(
+        name=LEVEL_ENEMIES[1]["name"],
+        game_id=game.id,
+        health=LEVEL_ENEMIES[1]["health"],
+        attack=LEVEL_ENEMIES[1]["attack"],
+        defense=LEVEL_ENEMIES[1]["defense"],
+    )
+    session.add(enemy)
+    session.commit()
 
     # Start battle
     console.print(Panel("Starting battle...", style="bold red"))

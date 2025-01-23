@@ -1,7 +1,8 @@
+# models/player.py
+from .import Base
+from .user import User
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from .base import Base
-from .game_base import Game
 
 class Player(Base):
     __tablename__ = "players"
@@ -11,7 +12,7 @@ class Player(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     # Define the relationship to the User model
-    user = relationship("User", back_populates="players")
+    user = relationship("User ", back_populates="players")
 
     # Define the relationship to the Game model
     games = relationship("Game", back_populates="player")
