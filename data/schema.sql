@@ -1,7 +1,3 @@
--- Essential Tables; to include, relationship notation as well as added indexes to improve performance and label notes for clarity.
-
--- indefinitely *under construction* XDDD
-
 -- Users Table
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,7 +13,8 @@ CREATE TABLE players (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     user_id INTEGER NOT NULL,
-    role TEXT NOT NULL,
+    char_class TEXT NOT NULL,
+    char_role TEXT NOT NULL,
     health INTEGER DEFAULT 100,
     mana INTEGER DEFAULT 100,
     attack INTEGER DEFAULT 10,
@@ -78,6 +75,8 @@ CREATE TABLE player_games (
 CREATE TABLE game_enemies (
     game_id INTEGER NOT NULL,
     enemy_id INTEGER NOT NULL,
+    spawned BOOLEAN DEFAULT FALSE,
+    defeated BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (game_id, enemy_id),
     FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (enemy_id) REFERENCES enemies(id) ON DELETE CASCADE ON UPDATE CASCADE

@@ -12,7 +12,7 @@ class Item(Base):
     name = Column(String, nullable=False)
     type = Column(String, nullable=False)
     player_id = Column(Integer, ForeignKey("players.id"), nullable=False)
-    player = relationship("Player", backref="items")
+    player = relationship("Player", back_populates="items")
     value = Column(Integer, default=0)
 
     def __repr__(self):

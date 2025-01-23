@@ -27,7 +27,7 @@ class BaseModel(Base):
         for key, value in kwargs.items():
             setattr(self, key, value)
         session.commit()
-        session.refresh(self)  # Refresh the entity after update
+        session.refresh(self)  # Refresh 
 
     def __repr__(self):
         return f"<{self.__class__.__name__} id={self.id}>"

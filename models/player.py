@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base
+from .game_base import Game
 
 class Player(Base):
     __tablename__ = "players"
@@ -10,10 +11,13 @@ class Player(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     # Define the relationship to the User model
-    user = relationship("User", back_populates="players")  
+    user = relationship("User", back_populates="players")
 
     # Define the relationship to the Game model
     games = relationship("Game", back_populates="player")
+
+    # Define the relationship to the Item model
+    items = relationship("Item", back_populates="player")
 
     # Character stats
     health = Column(Integer, default=100)
@@ -25,3 +29,7 @@ class Player(Base):
 
     def __repr__(self):
         return f"Player(id={self.id}, name='{self.name}', user_id={self.user_id}, health={self.health}, mana={self.mana}, attack={self.attack}, defense={self.defense}, char_class='{self.char_class}', char_role='{self.char_role}')"
+
+    def get_user(self, session):
+        from .user import User  # Lazy import
+        return session.query(User).filter_by(id=self.user_id).first()

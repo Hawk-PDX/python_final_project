@@ -1,69 +1,21 @@
-from utils.exceptions import InsufficientHealthError, InvalidActionError
-from models.player import Player
-from models.enemy import Enemy
-from models.game import Game
-from utils.database import Session
+from .fight_utils import fight
 
 def start_game(player):
-    session = Session()
-    game = Game(name="PDX Underground", description="You've been Shanghai'd", char_class="Paladin", char_role="Tank", player=player)
-    session.add(game)
-    session.commit()
-    add_player_to_game(session, player.id, game.id)  # Add player to game
-    session.close()
-
-def fight(player, enemy):
-    # Initialize health and mana/energy for player and enemy
+    # Initialize health and mana/energy for player
     player["health"] = 100  # Set player health to 100%
     player["mana"] = 100    # Set player mana to 100%
-    enemy.health = 100      # Set enemy health to 100%
 
+    # Create enemy - level 1
+    enemy = Enemy(name="Goblin", health=100, attack=10, defense=5)
+
+    # Start battle
+    print("Starting battle...")
+    fight(player, enemy)
+
+    # Check if player survived
     if player["health"] <= 0:
-        raise InsufficientHealthError("Player health depleted, cannot fight. You'll get 'em next time!")
-    
-    while player["health"] > 0 and enemy.health > 0:
-        print(f"Player health: {player['health']}, Mana: {player['mana']}")
-        print(f"Enemy health: {enemy.health}")
-        action = input("What do you want to do? (attack/use skill/use health potion/run): ").strip().lower()
-        
-        try:
-            if action == "attack":
-                enemy.health -= player["attack"]
-                print(f"You attacked {enemy.name} for {player['attack']} damage!")
-            elif action == "use skill":
-                skill = input("Which skill do you want to use? (Healing Strike/Shield Block): ").strip().lower()
-                if skill == "healing strike":
-                    player["health"] += 5
-                    enemy.health -= 10
-                    player["mana"] -= 10  # skill used, mana reduced accordingly
-                    print(f"You used Healing Strike on {enemy.name}!")
-                elif skill == "shield block":
-                    player["defense"] += 20
-                    player["mana"] -= 10  # same logic as above
-                    print(f"You used Shield Block!")
-                else:
-                    raise InvalidActionError("Invalid skill selected.")
-            elif action == "use health potion":
-                if player["health_potions"] > 0:
-                    player["health"] += 10
-                    player["health_potions"] -= 1
-                    print(f"You used a health potion!")
-                else:
-                    raise InsufficientHealthError("No health potions remaining.")
-            elif action == "run":
-                print("You ran away!")
-                break
-            else:
-                raise InvalidActionError("Invalid action selected.")
-            
-            if enemy.health > 0:
-                player["health"] -= enemy.attack
-                print(f"{enemy.name} attacked you for {enemy.attack} damage!")
-        except (InvalidActionError, InsufficientHealthError) as e:
-            print(f"Error: {str(e)}")
-            continue
-    
-    if player["health"] <= 0:
-        print("You died!")
+        print("Try again?… I'll be waiting")
+        return
     else:
-        print(f"You defeated {enemy.name}!")
+        print("You survived! Congratulations!")
+        print("You little… I'll get you next time!!!")

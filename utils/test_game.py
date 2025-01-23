@@ -2,8 +2,8 @@ import pytest
 from utils.database import Session
 from utils.crud_utils import create_user, validate_user_credentials, create_player, create_game, create_enemy
 from models.player import Player
-from models.enemy import Enemy
-from models.game import Game
+from models.enemy_base import Enemy
+from models.game_base import Game
 from models.user import User
 from models.item import Item
 from .exceptions import InvalidInputError, PlayerNotFoundError, DatabaseError

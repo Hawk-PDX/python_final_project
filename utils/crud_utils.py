@@ -1,7 +1,7 @@
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 from models.player import Player
-from models.enemy import Enemy
-from models.game import Game
+from models.enemy_base import Enemy
+from models.game_base import Game
 from models.item import Item
 from models.user import User
 from .exceptions import InvalidInputError, PlayerNotFoundError, DatabaseError
@@ -58,9 +58,9 @@ def validate_user_credentials(session: Session, username: str, password: str) ->
         InvalidInputError: If the credentials are invalid.
     """
     check_required_params({"username": username, "password": password}, ["username", "password"])
-    user = session.query(User).filter(User.username == username).first()
+    user = session.query(User).filter_by(username=username).first()
     if not user:
-        raise PlayerNotFoundError(f"User  with username '{username}' not found.")
+        raise PlayerNotFoundError(f"User     with username '{username}' not found.")
     if not bcrypt.verify(password, user.password):
         raise InvalidInputError("Invalid credentials.")
     return user
