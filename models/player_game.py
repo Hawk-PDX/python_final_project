@@ -1,5 +1,8 @@
 from sqlalchemy import Table, Column, Integer, ForeignKey
 from .base import Base
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
 
 player_games = Table(
     "player_games",

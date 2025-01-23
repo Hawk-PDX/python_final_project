@@ -19,139 +19,132 @@ def check_required_params(params, required_fields):
         if not params.get(field):
             raise InvalidInputError(f"{field} is required.")
 
-# Consolidated function for creating entities
-def create_entity(session: Session, entity_type: str, **kwargs) -> object:
+# Create user function
+def create_user(session: Session, username: str, email: str, password: str) -> User:
     """
-    Creates a new entity of the specified type.
+    Creates a new user in the database.
 
     Args:
         session (Session): The database session.
-        entity_type (str): The type of entity to create.
-        **kwargs: Additional keyword arguments for the entity.
+        username (str): The username of the user.
+        email (str): The email of the user.
+        password (str): The password of the user.
 
     Returns:
-        object: The created entity.
-
-    Raises:
-        InvalidInputError: If the entity type is invalid.
-        DatabaseError: If the entity creation fails.
+        User: The created user object.
     """
-    try:
-        if entity_type == "user":
-            check_required_params(kwargs, ["username", "email", "password"])
-            hashed_password = bcrypt.hash(kwargs["password"])
-            entity = User(username=kwargs["username"], email=kwargs["email"], password=hashed_password)
-        elif entity_type == "player":
-            check_required_params(kwargs, ["name", "user_id"])
-            entity = Player(name=kwargs["name"], user_id=kwargs["user_id"], **kwargs)
-        elif entity_type == "game":
-            check_required_params(kwargs, ["name", "description", "char_class", "char_role", "player_id"])
-            entity = Game(name=kwargs["name"], description=kwargs["description"], char_class=kwargs["char_class"], char_role=kwargs["char_role"], player_id=kwargs["player_id"])
-        elif entity_type == "enemy":
-            check_required_params(kwargs, ["name", "game_id"])
-            entity = Enemy(name=kwargs["name"], game_id=kwargs["game_id"], health=kwargs.get("health", 100), attack=kwargs.get("attack", 10), defense=kwargs.get("defense", 5))
-        elif entity_type == "item":
-            check_required_params(kwargs, ["name", "type", "player_id"])
-            entity = Item(name=kwargs["name"], type=kwargs["type"], player_id=kwargs["player_id"], value=kwargs.get("value", 0))
-        else:
-            raise InvalidInputError(f"Invalid entity type: {entity_type}")
+    check_required_params({"username": username, "email": email, "password": password}, ["username", "email", "password"])
+    hashed_password = bcrypt.hash(password)
+    user = User(username=username, email=email, password=hashed_password)
+    session.add(user)
+    session.commit()
+    return user
 
-        session.add(entity)
-        session.commit()
-        return entity
-    except Exception as e:
-        session.rollback()
-        raise DatabaseError(f"Failed to create {entity_type}: {str(e)}") from e
-
-def get_entity(session: Session, entity_type: str, entity_id: int) -> object:
+# Validate user credentials
+def validate_user_credentials(session: Session, username: str, password: str) -> User:
     """
-    Retrieves an entity of the specified type by ID.
+    Validates user credentials.
 
     Args:
         session (Session): The database session.
-        entity_type (str): The type of entity to retrieve.
-        entity_id (int): The ID of the entity to retrieve.
+        username (str): The username of the user.
+        password (str): The password of the user.
 
     Returns:
-        object: The retrieved entity.
+        User: The user object if credentials are valid.
 
     Raises:
-        InvalidInputError: If the entity type is invalid.
+        PlayerNotFoundError: If the user is not found.
+        InvalidInputError: If the credentials are invalid.
     """
-    if entity_type == "user":
-        return session.query(User).filter(User.id == entity_id).first()
-    elif entity_type == "player":
-        return session.query(Player).options(joinedload(Player.items)).filter(Player.id == entity_id).first()
-    elif entity_type == "game":
-        return session.query(Game).options(joinedload(Game.enemies)).filter(Game.id == entity_id).first()
-    elif entity_type == "enemy":
-        return session.query(Enemy).filter(Enemy.id == entity_id).first()
-    elif entity_type == "item":
-        return session.query(Item).filter(Item.id == entity_id).first()
-    else:
-        raise InvalidInputError(f"Invalid entity type: {entity_type}")
-    
-# updating entities
-def update_entity(session: Session, entity_type: str, entity_id: int, **kwargs) -> object:
-    """
-    Updates an entity of the specified type by ID.
-
-    Args:
-        session (Session): The database session.
-        entity_type (str): The type of entity to update.
-        entity_id (int): The ID of the entity to update.
-        **kwargs: Additional keyword arguments for the entity.
-
-    Returns:
-        object: The updated entity.
-
-    Raises:
-        InvalidInputError: If the entity type is invalid.
-    """
-    entity = get_entity(session, entity_type, entity_id)
-    if entity:
-        for key, value in kwargs.items():
-            setattr(entity, key, value)
-        session.commit()
-        session.refresh(entity)  # Refresh the entity after update
-    return entity
-
-# Delete entities -- consolodated 
-def delete_entity(session: Session, entity_type: str, entity_id: int):
-    """
-    Deletes an entity of the specified type by ID.
-
-    Args:
-        session (Session): The database session.
-        entity_type (str): The type of entity to delete.
-        entity_id (int): The ID of the entity to delete.
-
-    Raises:
-        InvalidInputError: If the entity type is invalid.
-    """
-    entity = get_entity(session, entity_type, entity_id)
-    if entity:
-        session.delete(entity)
-        session.commit()
-
-# Specific function for validating user credentials
-def validate_user_credentials(session: Session, username: str, password: str):
     check_required_params({"username": username, "password": password}, ["username", "password"])
     user = session.query(User).filter(User.username == username).first()
     if not user:
-        raise PlayerNotFoundError(f"User    with username '{username}' not found.")
+        raise PlayerNotFoundError(f"User  with username '{username}' not found.")
     if not bcrypt.verify(password, user.password):
         raise InvalidInputError("Invalid credentials.")
     return user
 
-def add_player_to_game(session: Session, player_id: int, game_id: int):
-    session.execute(player_games.insert().values(player_id=player_id, game_id=game_id))
-    session.commit()
+# Create player function
+def create_player(session: Session, name: str, user_id: int) -> Player:
+    """
+    Creates a new player in the database.
 
-def add_enemy_to_game(session: Session, enemy_id: int, game_id: int):
-    session.execute(game_enemies.insert().values(enemy_id=enemy_id, game_id=game_id))
-    session.commit()
+    Args:
+        session (Session): The database session.
+        name (str): The name of the player.
+        user_id (int): The ID of the user associated with the player.
 
-def add_player_to_user(session: Session, player_id: int, user_id: int):
-    session.execute(user_players.insert().values(player_id=player_id, user_id=user_id))
+    Returns:
+        Player: The created player object.
+    """
+    check_required_params({"name": name, "user_id": user_id}, ["name", "user_id"])
+    player = Player(name=name, user_id=user_id)
+    session.add(player)
     session.commit()
+    return player
+
+# Create game function
+def create_game(session: Session, name: str, description: str, char_class: str, char_role: str, player_id: int) -> Game:
+    """
+    Creates a new game in the database.
+
+    Args:
+        session (Session): The database session.
+        name (str): The name of the game.
+        description (str): The description of the game.
+        char_class (str): The character class.
+        char_role (str): The character role.
+        player_id (int): The ID of the player associated with the game.
+
+    Returns:
+        Game: The created game object.
+    """
+    check_required_params({"name": name, "description": description, "char_class": char_class, "char_role": char_role, "player_id": player_id}, ["name", "description", "char_class", "char_role", "player_id"])
+    game = Game(name=name, description=description, char_class=char_class, char_role=char_role, player_id=player_id)
+    session.add(game)
+    session.commit()
+    return game
+
+# Create enemy function
+def create_enemy(session: Session, name: str, game_id: int, health: int = DEFAULT_ENEMY_HEALTH, attack: int = DEFAULT_ENEMY_ATTACK, defense: int = DEFAULT_ENEMY_DEFENSE) -> Enemy:
+    """
+    Creates a new enemy in the database.
+
+    Args:
+        session (Session): The database session.
+        name (str): The name of the enemy.
+        game_id (int): The ID of the game associated with the enemy.
+        health (int): The health of the enemy.
+        attack (int): The attack power of the enemy.
+        defense (int): The defense power of the enemy.
+
+    Returns:
+        Enemy: The created enemy object.
+    """
+    check_required_params({"name": name, "game_id": game_id}, ["name", "game_id"])
+    enemy = Enemy(name=name, game_id=game_id, health=health, attack=attack, defense=defense)
+    session.add(enemy)
+    session.commit()
+    return enemy
+
+# Create item function
+def create_item(session: Session, name: str, type: str, player_id: int, value: int = DEFAULT_ITEM_VALUE) -> Item:
+    """
+    Creates a new item in the database.
+
+    Args:
+        session (Session): The database session.
+        name (str): The name of the item.
+        type (str): The type of the item.
+        player_id (int): The ID of the player associated with the item.
+        value (int): The value of the item.
+
+    Returns:
+        Item: The created item object.
+    """
+    check_required_params({"name": name, "type": type, "player_id": player_id}, ["name", "type", "player_id"])
+    item = Item(name=name, type=type, player_id=player_id, value=value)
+    session.add(item)
+    session.commit()
+    return item

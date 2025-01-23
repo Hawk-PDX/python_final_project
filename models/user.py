@@ -11,6 +11,9 @@ class User(Base):
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
 
+    # Define the relationship to the Player model
+    players = relationship("Player", back_populates="user")
+
     def __init__(self, username, email, password):
         self.username = username
         self.email = email

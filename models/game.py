@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base
+from .player import Player  # Ensure Player is imported here
 
 class Game(Base):
     __tablename__ = "games"
@@ -11,7 +12,9 @@ class Game(Base):
     char_class = Column(String, nullable=False)
     char_role = Column(String, nullable=False)
     player_id = Column(Integer, ForeignKey("players.id"), nullable=False)
-    player = relationship("Player", backref="games")
+
+    # Define the relationship to the Player model
+    player = relationship("Player", back_populates="games")
 
     def __repr__(self):
         return f"Game(id={self.id}, name='{self.name}', description='{self.description}', char_class='{self.char_class}', char_role='{self.char_role}', player_id={self.player_id})"
