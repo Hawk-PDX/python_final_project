@@ -70,13 +70,17 @@ class Combat:
             console.print(f"[bold yellow]{self.enemy['name']} blocked your attack![/bold yellow]")
 
     def defend(self):
-        self.character.defense += 5
+        self.character.temporary_defense_boost = 5  # Apply a temporary defense boost
         console.print(f"[bold cyan]{self.character.name} is defending![/bold cyan]")
 
     def enemy_attack(self):
-        damage = self.enemy["attack"] - self.character.defense
+        # Calculate damage with temporary defense boost
+        damage = self.enemy["attack"] - (self.character.defense + self.character.temporary_defense_boost)
         if damage > 0:
             self.character.take_damage(damage)
             console.print(f"[bold red]{self.enemy['name']} dealt {damage} damage to you![/bold red]")
         else:
             console.print(f"[bold yellow]You blocked {self.enemy['name']}'s attack![/bold yellow]")
+        
+        # Reset temporary defense boost after the enemy's attack
+        self.character.temporary_defense_boost = 0

@@ -10,6 +10,7 @@ class Character:
         self.level = None  # Reference to the current level
         self.health_potions = 1  # Each player starts with 1 minor health potion
         self.attack_potions = 1  # Each player starts with 1 minor attack potion
+        self.temporary_defense_boost = 0  # Temporary defense boost from the defend action
 
     def __repr__(self):
         return f"Character(name={self.name}, class={self.char_class}, health={self.health}, mana={self.mana}, attack={self.attack}, defense={self.defense}, role={self.char_role})"
@@ -43,3 +44,4 @@ class Character:
         self.level = level
         self.health_potions = 1  # Replenish health potion at the start of each level
         self.attack_potions = 1  # Replenish attack potion at the start of each level
+        self.temporary_defense_boost = 0  # Reset temporary defense boost at the start of each level
