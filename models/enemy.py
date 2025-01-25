@@ -12,7 +12,6 @@ class Enemy(Base):
     attack = Column(Integer, default=10)
     defense = Column(Integer, default=5)
 
-    # Define the relationship to the Game model
     game = relationship("Game", back_populates="enemies")
 
     def __repr__(self):
