@@ -1,4 +1,3 @@
-# game_logic/level.py
 class Level:
     def __init__(self, level_number, enemies, rewards):
         self.level_number = level_number
@@ -11,6 +10,8 @@ class Level:
 
     def set_character(self, character):
         self.character = character
+        self.character.health_potions = 1  # Replenish health potion at the start of each level
+        self.character.attack_potions = 1  # Replenish attack potion at the start of each level
 
     def start(self):
         print(f"Starting Level {self.level_number}...")
