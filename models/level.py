@@ -1,6 +1,6 @@
-# models/level.py
-from sqlalchemy import Column, Integer, String, ForeignKey
 from .base import Base
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 class Level(Base):
     __tablename__ = 'levels'

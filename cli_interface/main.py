@@ -6,6 +6,8 @@ from rich.style import Style
 from game_logic.character import Character
 from game_logic.level import Level
 from game_logic.combat import Combat
+from utils.database import Session, engine
+from models import Player, Game, Enemy, Item
 
 console = Console()
 
@@ -13,6 +15,7 @@ class CLIInterface:
     def __init__(self):
         self.character = None
         self.level = None
+        self.session = Session()
 
     def display_welcome_message(self):
         """Display a stylish welcome message using rich."""
@@ -46,6 +49,8 @@ class CLIInterface:
         defense = 5
         char_role = "Adventurer"
         self.character = Character(name, char_class, health, mana, attack, defense, char_role)
+        self.session.add(self.character)
+        self.session.commit()
         console.print(f"[bold green]Character {name} created successfully![/bold green]")
 
     def start_game(self):
@@ -61,8 +66,18 @@ class CLIInterface:
         self.level.set_character(self.character)
         self.level.start()
 
-        # Start combat with the first enemy
-        combat = Combat(self.character, enemies[0])
+        # Create a game
+        game = Game(name="My Game", description="My Game Description", player_id=self.character.id)
+        self.session.add(game)
+        self.session.commit()
+
+        # Create an enemy
+        enemy = Enemy(name="Goblin", game_id=game.id, health=100, attack=10, defense=5)
+        self.session.add(enemy)
+        self.session.commit()
+
+        # Start combat
+        combat = Combat(self.session, self.character, enemy)
         combat.start()
 
     def main(self):

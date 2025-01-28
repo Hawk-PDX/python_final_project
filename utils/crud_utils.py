@@ -1,11 +1,10 @@
 from sqlalchemy.orm import Session
-from models import Enemy, Player, Game, Item, User
+from models import User, Player, Game, Enemy, Item
 from .exceptions import InvalidInputError, PlayerNotFoundError, GameNotFoundError, EnemyNotFoundError, ItemNotFoundError, DatabaseError
 from passlib.hash import bcrypt
 
 def create_user(session: Session, username: str, email: str, password: str) -> User:
-    hashed_password = bcrypt.hash(password)
-    user = User(username=username, email=email, password=hashed_password)
+    user = User(username=username, email=email, password=bcrypt.hash(password))
     session.add(user)
     session.commit()
     return user
@@ -35,3 +34,9 @@ def create_enemy(session: Session, name: str, game_id: int, health: int = 100, a
     session.add(enemy)
     session.commit()
     return enemy
+
+def create_item(session: Session, name: str, type: str, player_id: int, value: int = 0) -> Item:
+    item = Item(name=name, type=type, player_id=player_id, value=value)
+    session.add(item)
+    session.commit()
+    return item

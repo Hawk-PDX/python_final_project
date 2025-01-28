@@ -1,7 +1,7 @@
 from .exceptions import InsufficientHealthError, InvalidActionError
 from models import Player, Enemy
 
-def fight(player, enemy):
+def fight(player: Player, enemy: Enemy):
     while player.health > 0 and enemy.health > 0:
         print(f"Player health: {player.health}, Mana: {player.mana}")
         print(f"Enemy health: {enemy.health}")

@@ -1,6 +1,6 @@
-# models/character.py
-from sqlalchemy import Column, Integer, String
 from .base import Base
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 class Character(Base):
     __tablename__ = 'characters'

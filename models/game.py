@@ -3,15 +3,18 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 class Game(Base):
-    __tablename__ = "games"
+    __tablename__ = 'games'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
-    player_id = Column(Integer, ForeignKey("players.id"), nullable=False)
+    char_class = Column(String, nullable=False)
+    char_role = Column(String, nullable=False)
+    player_id = Column(Integer, ForeignKey('players.id'), nullable=False)
 
-    player = relationship("Player", back_populates="games")
-    enemies = relationship("Enemy", back_populates="game")
+    player = relationship('Player', back_populates='games')
+    enemies = relationship('Enemy', back_populates='game')
+    items = relationship('Item', back_populates='game')
 
     def __repr__(self):
         return f"Game(id={self.id}, name='{self.name}', description='{self.description}', player_id={self.player_id})"

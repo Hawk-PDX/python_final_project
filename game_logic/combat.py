@@ -1,86 +1,80 @@
-from rich.console import Console
-from rich.table import Table
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from .character import Character
+from .level import Level
 
-console = Console()
+Base = declarative_base()
 
-class Combat:
-    def __init__(self, character, enemy):
-        self.character = character
-        self.enemy = enemy
+class Combat(Base):
+    __tablename__ = 'combats'
+
+    id = Column(Integer, primary_key=True)
+    character_id = Column(Integer, nullable=False)
+    enemy_id = Column(Integer, nullable=False)
+    level_id = Column(Integer, nullable=False)
+
+    def __repr__(self):
+        return f"Combat(id={self.id}, character_id={self.character_id}, enemy_id={self.enemy_id}, level_id={self.level_id})"
 
     def start(self):
-        if self.character.health <= 0 or self.enemy["health"] <= 0:
-            console.print("[bold red]Cannot start combat: one or both participants are already dead.[/bold red]")
-            return
+        character = session.query(Character).get(self.character_id)
+        enemy = session.query(Enemy).get(self.enemy_id)
+        level = session.query(Level).get(self.level_id)
 
-        console.print(f"[bold yellow]Combat started between {self.character.name} and {self.enemy['name']}![/bold yellow]")
-        while self.character.health > 0 and self.enemy["health"] > 0:
-            self.display_combat_status()
-            action = console.input("[bold]Choose action (1/2/3/4/5): [/bold]").strip()
+        print(f"Combat started between {character.name} and {enemy.name} on Level {level.level_number}...")
+        while character.health > 0 and enemy.health > 0:
+            print(f"{character.name}'s health: {character.health}")
+            print(f"{enemy.name}'s health: {enemy.health}")
+            action = input("What do you want to do? (attack/use skill/use health potion/run): ").strip().lower()
 
-            if action == "1":
-                self.attack()
-            elif action == "2":
-                self.defend()
-            elif action == "3":
-                self.character.use_health_potion()
-            elif action == "4":
-                self.character.use_attack_potion()
-            elif action == "5":
-                console.print("[bold red]You ran away![/bold red]")
+            if action == "attack":
+                enemy.health -= character.attack
+                print(f"{character.name} attacked {enemy.name} for {character.attack} damage!")
+            elif action == "use skill":
+                skill = input("Which skill do you want to use? (Healing Strike/Shield Block): ").strip().lower()
+                if skill == "healing strike":
+                    character.health += 5
+                    enemy.health -= 10
+                    character.mana -= 10  # skill used, mana reduced accordingly
+                    print(f"{character.name} used Healing Strike on {enemy.name}!")
+                elif skill == "shield block":
+                    character.defense += 20
+                    character.mana -= 10  # same logic as above
+                    print(f"{character.name} used Shield Block!")
+                else:
+                    print("Invalid skill selected.")
+            elif action == "use health potion":
+                if character.health_potions > 0:
+                    character.health += 15
+                    character.health_potions -= 1
+                    print(f"{character.name} used a minor health potion and restored 15 health!")
+                else:
+                    print("No health potions remaining.")
+            elif action == "run":
+                print("You ran away!")
                 break
             else:
-                console.print("[bold red]Invalid action! Please choose 1, 2, 3, 4, or 5.[/bold red]")
-                continue
+                print("Invalid action selected.")
 
-            # Enemy attacks after the player's turn
-            if self.enemy["health"] > 0:
-                self.enemy_attack()
+            if enemy.health > 0:
+                character.health -= enemy.attack
+                print(f"{enemy.name} attacked {character.name} for {enemy.attack} damage!")
 
-        if self.character.health > 0:
-            console.print(f"[bold green]You defeated {self.enemy['name']}![/bold green]")
+        if character.health > 0:
+            print(f"{character.name} defeated {enemy.name}!")
         else:
-            console.print("[bold red]You were defeated![/bold red]")
+            print(f"{character.name} was defeated by {enemy.name}!")
 
-    def display_combat_status(self):
-        """Display the combat status using rich."""
-        status_table = Table(title="Combat Status", border_style="bright_blue")
-        status_table.add_column("Character", justify="left", style="cyan")
-        status_table.add_column("Health", justify="right", style="green")
-        status_table.add_row(f"{self.character.name}", f"{self.character.health}")
-        status_table.add_row(f"{self.enemy['name']}", f"{self.enemy['health']}")
-        console.print(status_table)
+# Create a SQLAlchemy engine
+engine = create_engine('sqlite:///game.db')
 
-        action_table = Table(title="Actions", show_header=False, border_style="bright_yellow")
-        action_table.add_column("Option", justify="center", style="cyan")
-        action_table.add_column("Description", justify="left", style="magenta")
-        action_table.add_row("1", "Attack")
-        action_table.add_row("2", "Defend")
-        action_table.add_row("3", "Use Health Potion")
-        action_table.add_row("4", "Use Attack Potion")
-        action_table.add_row("5", "Run")
-        console.print(action_table)
+# Create a configured "Session" class
+Session = sessionmaker(bind=engine)
 
-    def attack(self):
-        damage = self.character.attack - self.enemy["defense"]
-        if damage > 0:
-            self.enemy["health"] -= damage
-            console.print(f"[bold green]You dealt {damage} damage to {self.enemy['name']}![/bold green]")
-        else:
-            console.print(f"[bold yellow]{self.enemy['name']} blocked your attack![/bold yellow]")
+# Create a session
+session = Session()
 
-    def defend(self):
-        self.character.temporary_defense_boost = 5  # Apply a temporary defense boost
-        console.print(f"[bold cyan]{self.character.name} is defending![/bold cyan]")
-
-    def enemy_attack(self):
-        # Calculate damage with temporary defense boost
-        damage = self.enemy["attack"] - (self.character.defense + self.character.temporary_defense_boost)
-        if damage > 0:
-            self.character.take_damage(damage)
-            console.print(f"[bold red]{self.enemy['name']} dealt {damage} damage to you![/bold red]")
-        else:
-            console.print(f"[bold yellow]You blocked {self.enemy['name']}'s attack![/bold yellow]")
-        
-        # Reset temporary defense boost after the enemy's attack
-        self.character.temporary_defense_boost = 0
+# Create the tables
+Base.metadata.create_all(engine)

@@ -1,4 +1,3 @@
-# models/base.py
 from sqlalchemy import Column, Integer, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -28,7 +27,7 @@ class BaseModel(Base):
         for key, value in kwargs.items():
             setattr(self, key, value)
         session.commit()
-        session.refresh(self)  # Refresh 
+        session.refresh(self)  # Refresh the instance
 
     def __repr__(self):
         return f"<{self.__class__.__name__} id={self.id}>"

@@ -1,11 +1,10 @@
-from cli_interface.main import CLIInterface
+from cli_interface import CLIInterface
+from utils.database import Session
 
 def main():
-    try:
-        cli = CLIInterface()
-        cli.main()
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    session = Session()
+    cli_interface = CLIInterface(session)
+    cli_interface.main()
 
 if __name__ == "__main__":
     main()

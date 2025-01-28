@@ -1,17 +1,25 @@
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+from models import User, Player, Game, Enemy, Item
+
 DATABASE_URL = 'sqlite:///game_database.db'
-from utils.database import Session
-from utils.crud_utils import create_user, get_user, update_user, delete_user
+engine = create_engine(DATABASE_URL)
+Session = Session(bind=engine)
 
 # Create user
 session = Session()
-new_user = create_user(session, username='john_doe', email='john@example.com', password='password123')
+new_user = User(username='john_doe', email='john@example.com', password='password123')
+session.add(new_user)
+session.commit()
 
 # Get user
-user = get_user(session, new_user.id)
+user = session.query(User).filter_by(username='john_doe').first()
 
 # Update user
-updated_user = update_user(session, user.id, email='john.doe@example.com')
+updated_user = User(username='jane_doe', email='jane@example.com', password='password123')
+session.add(updated_user)
+session.commit()
 
 # Delete user
-delete_user(session, user.id)
-session.close()
+session.query(User).filter_by(username='john_doe').delete()
+session.commit()
